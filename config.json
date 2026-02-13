@@ -1,0 +1,64 @@
+{
+  "providers": [
+    {
+      "name": "openrouter",
+      "apiKeys": [
+        "api 1",
+        "api 2",
+        "api 3"
+      ],
+      "models": [
+        {
+          "name": "nvidia/nemotron-nano-12b-v2-vl:free",
+          "displayName": "NVIDIA: Nemotron Nano 12B 2 VL (free)",
+          "supportsVision": true
+        },
+        {
+          "name": "mistralai/mistral-small-3.1-24b-instruct:free",
+          "displayName": "Mistral: Mistral Small 3.1 24B (free)",
+          "supportsVision": true
+        },
+        {
+          "name": "google/gemma-3-4b-it:free",
+          "displayName": "Google: Gemma 3 4B (free)",
+          "supportsVision": true
+        },
+        {
+          "name": "google/gemma-3-12b-it:free",
+          "displayName": "Google: Gemma 3 12B (free)",
+          "supportsVision": true
+        },
+        {
+          "name": "google/gemma-3-27b-it:free",
+          "displayName": "Google: Gemma 3 27B (free)",
+          "supportsVision": true
+        },
+        {
+          "name": "google/gemini-2.0-flash-lite-001",
+          "displayName": "Google: Gemini 2.0 Flash Lite",
+          "supportsVision": true
+        }
+      ],
+      "currentModelIndex": 0,
+      "currentApiKeyIndex": 8,
+      "baseURL": "https://openrouter.ai/api/v1"
+    },
+    {
+      "name": "together",
+      "apiKeys": [
+        "95a81216cc08be0c416d7e0a1caac5cf4fc66f114d4d89cb86d875c9d25debbf"
+      ],
+      "models": [
+        {
+          "name": "deepseek-ai/DeepSeek-R1-Distill-Llama-70B-Free",
+          "displayName": "DeepSeek R1 Distill Llama 70B Free"
+        }
+      ],
+      "currentModelIndex": 0,
+      "currentApiKeyIndex": 0,
+      "baseURL": "https://api.together.xyz/v1"
+    }
+  ],
+  "currentProvider": "openrouter",
+  "fallbackToNextProvider": false
+}

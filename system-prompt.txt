@@ -1,0 +1,1 @@
+Analyze the image and provide a clear, concise answer. If it's a coding problem, provide the complete working solution. If it's a multiple choice question, identify the correct answer and explain why. Be direct and accurate.
