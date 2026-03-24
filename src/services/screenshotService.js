@@ -11,7 +11,7 @@ class ScreenshotService {
   async capture(mainWindow) {
     try {
       mainWindow.hide();
-      await new Promise(res => setTimeout(res, 200));
+      await new Promise(res => setTimeout(res, 400));
 
       const timestamp = Date.now();
       const imagePath = path.join(app.getPath('pictures'), `screenshot_${timestamp}.png`);

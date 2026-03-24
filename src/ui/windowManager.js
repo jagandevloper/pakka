@@ -5,14 +5,23 @@ class WindowManager {
   constructor() {
     this.mainWindow = null;
     this.showWindow = true;
-    this.stage = 0; // 0 = idle, 2 = showing results
+    this.stage = 0; // 0 = idle, 1 = processing, 2 = showing results, 3 = settings, 4 = history
+    this.darkMode = false;
+    this.transparency = 95;
+    this.settingsManager = null;
   }
 
-  create() {
+  create(settingsManager = null) {
+    this.settingsManager = settingsManager;
     this.stage = 0;
+    
+    // Get window settings
+    const width = settingsManager?.get('windowWidth') || 400;
+    const height = settingsManager?.get('windowHeight') || 300;
+    
     this.mainWindow = new BrowserWindow({
-      width: 400,
-      height: 300,
+      width: width,
+      height: height,
       minWidth: 300,
       minHeight: 200,
       maxWidth: 1200,
@@ -65,8 +74,29 @@ class WindowManager {
         this.mainWindow.setAlwaysOnTop(true, 'screen-saver', 1);
       }
     }, 2000);
+    
+    // Initialize dark mode from settings
+    if (settingsManager) {
+      const theme = settingsManager.get('theme');
+      this.darkMode = theme === 'dark' || (theme === 'auto' && this.isSystemDarkMode());
+      
+      // Initialize transparency from settings
+      const transparency = settingsManager.get('transparency');
+      if (transparency !== undefined && transparency !== null) {
+        this.mainWindow.setOpacity(transparency);
+      }
+    }
 
     return this.mainWindow;
+  }
+  
+  isSystemDarkMode() {
+    try {
+      const { nativeTheme } = require('electron');
+      return nativeTheme.shouldUseDarkColors;
+    } catch {
+      return false;
+    }
   }
 
   updateInstruction(instruction) {
@@ -94,6 +124,19 @@ class WindowManager {
       this.stage = 2;
     }
   }
+  
+  /**
+   * Update result during streaming
+   */
+  updateStreamingResult(content) {
+    if (this.mainWindow?.webContents) {
+      this.mainWindow.webContents.send('streaming-update', content);
+      if (this.stage !== 2) {
+        this.mainWindow.setIgnoreMouseEvents(false);
+        this.stage = 2;
+      }
+    }
+  }
 
   showError(error) {
     if (this.mainWindow?.webContents) {
@@ -108,7 +151,6 @@ class WindowManager {
       this.mainWindow.webContents.send('show-app');
       this.mainWindow.setIgnoreMouseEvents(false);
     } else {
-      this.updateInstruction("Ctrl+Shift+S: Screenshot | Ctrl+Shift+1: API Key | Ctrl+Shift+2: Model | Arrows: Move");
       this.mainWindow.setIgnoreMouseEvents(true, { forward: true });
     }
     this.showWindow = true;
@@ -152,7 +194,6 @@ class WindowManager {
   clear() {
     if (this.mainWindow?.webContents) {
       this.mainWindow.webContents.send('clear-result');
-      this.updateInstruction("Ctrl+Shift+S: Screenshot | Ctrl+Shift+1: API Key | Ctrl+Shift+2: Model | Arrows: Move");
       this.stage = 0;
       this.mainWindow.setIgnoreMouseEvents(true, { forward: true });
     }
@@ -164,6 +205,84 @@ class WindowManager {
 
   isShowing() {
     return this.showWindow;
+  }
+  
+  /**
+   * Toggle dark mode
+   */
+  toggleDarkMode() {
+    this.darkMode = !this.darkMode;
+    if (this.mainWindow?.webContents) {
+      this.mainWindow.webContents.send('toggle-dark-mode', this.darkMode);
+    }
+    this.showNotification(`Theme: ${this.darkMode ? 'Dark' : 'Light'}`);
+    
+    // Save preference
+    if (this.settingsManager) {
+      this.settingsManager.set('theme', this.darkMode ? 'dark' : 'light');
+    }
+  }
+
+  /**
+   * Adjust transparency by delta (negative = more opaque, positive = more transparent)
+   */
+  adjustTransparency(delta) {
+    if (!this.transparency) this.transparency = 95;
+    this.transparency = Math.max(20, Math.min(100, this.transparency + delta));
+    
+    if (this.mainWindow) {
+      this.mainWindow.setOpacity(this.transparency / 100);
+    }
+    this.showNotification(`Transparency: ${this.transparency}%`);
+    
+    // Notify renderer to update UI
+    if (this.mainWindow?.webContents) {
+      this.mainWindow.webContents.send('transparency-changed', this.transparency);
+    }
+  }
+  
+  /**
+   * Show history panel
+   */
+  showHistory(history) {
+    if (this.mainWindow?.webContents) {
+      this.mainWindow.webContents.send('show-history', history);
+      this.mainWindow.setIgnoreMouseEvents(false);
+      this.stage = 4;
+    }
+  }
+  
+  /**
+   * Show settings panel
+   */
+  showSettings(settings) {
+    if (this.mainWindow?.webContents) {
+      this.mainWindow.webContents.send('show-settings', settings);
+      this.mainWindow.setIgnoreMouseEvents(false);
+      this.stage = 3;
+    }
+  }
+
+  /**
+   * Set window opacity/transparency
+   */
+  setOpacity(value) {
+    if (this.mainWindow && !this.mainWindow.isDestroyed()) {
+      // Clamp value between 0.2 and 1.0
+      const opacity = Math.max(0.2, Math.min(1.0, value));
+      this.mainWindow.setOpacity(opacity);
+      console.log(`Window opacity set to ${opacity}`);
+    }
+  }
+
+  /**
+   * Get current opacity
+   */
+  getOpacity() {
+    if (this.mainWindow && !this.mainWindow.isDestroyed()) {
+      return this.mainWindow.getOpacity();
+    }
+    return 1.0;
   }
 }
 

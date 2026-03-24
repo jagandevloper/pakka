@@ -83,6 +83,23 @@ class ConfigManager {
     return `Model: ${currentModel.displayName}`;
   }
 
+  /**
+   * Switch to a specific provider by name
+   */
+  switchProvider(providerName) {
+    if (!this.config?.providers) return null;
+    
+    const provider = this.config.providers.find(p => p.name === providerName);
+    if (!provider) return null;
+    
+    this.config.currentProvider = providerName;
+    this.currentApiKeyIndex = provider.currentApiKeyIndex || 0;
+    this.save();
+    
+    console.log(`Switched to Provider: ${providerName}`);
+    return `Provider: ${providerName}`;
+  }
+
   rotateToNextKey() {
     const provider = this.getCurrentProvider();
     if (!provider || !provider.apiKeys) return;

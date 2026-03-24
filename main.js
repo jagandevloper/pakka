@@ -342,7 +342,6 @@ async function processScreenshots() {
 function resetProcess() {
   currentScreenshot = null;
   mainWindow.webContents.send('clear-result');
-  updateInstruction("Ctrl+Shift+S: Screenshot | Ctrl+Shift+1: API Key | Ctrl+Shift+2: Model | Arrows: Move");
   stage = 0;
   // Back to click-through mode
   mainWindow.setIgnoreMouseEvents(true, { forward: true });
