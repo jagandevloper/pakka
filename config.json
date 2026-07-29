@@ -3,8 +3,12 @@
     {
       "name": "openrouter",
       "apiKeys": [
-        "sk-or-v1-YOUR_OPENROUTER_API_KEY_1",
-        "sk-or-v1-YOUR_OPENROUTER_API_KEY_2"
+        "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",
+        "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",
+        "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",
+        "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",
+        "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",
+        "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"
       ],
       "models": [
         {
@@ -76,7 +80,7 @@
     {
       "name": "together",
       "apiKeys": [
-        "YOUR_TOGETHER_API_KEY"
+        "95a81216cc08be0c416d7e0a1caac5cf4fc66f114d4d89cb86d875c9d25debbf"
       ],
       "models": [
         {
